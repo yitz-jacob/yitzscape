@@ -5,7 +5,7 @@
 <body>
 <ul>
 {% for page in pages %}
-<li><a href="/{{ page.name }}">{{page.name}}</a></li>
+<li><a href="/{{ page.name }}">{{page.name}}</a> <span class="public">(public: {{page.public}})</span> <span class="tags">(tags: {{page.tags}})</span></li>
 {% endfor %}
 </ul>
 </body>
