@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>edit homepage -yitzscape</title>
+<title>edit {{pageName}} -yitzscape</title>
 </head>
 <body>
 <form method="POST" name="editForm" action="/{{pageName}}/edit">
@@ -10,6 +10,7 @@
 {{ page.content|escape }}
 </textarea>
 
+<label for="tags">Tags</label><input type="text" id="tags" style="width:50%;" value="{{tags|escape}}" name="tags"/> <input type="checkbox" id="public" {{public}} name="public"> <label for="public">Public</label>
 <br/>
 <input type="submit" value="Save"/>
 </form>
