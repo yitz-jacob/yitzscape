@@ -15,6 +15,7 @@ class HomePage(db.Model):
 	lastmod = db.DateTimeProperty(auto_now_add=True)
 	name = db.StringProperty(multiline=False)
 	public = db.BooleanProperty()
+	tags = db.StringProperty(multiline=False)
 	
 class doList(webapp.RequestHandler):
 	def get(self):
@@ -22,6 +23,15 @@ class doList(webapp.RequestHandler):
 
 		pages = pageq.fetch(100)
 		
+		display_pages = list()
+
+		for page in pages:
+			if not page.public:
+				if users.is_current_user_admin():
+					display_pages.append(page)
+			else:
+				display_pages.append(page)	
+
 		if users.get_current_user():
 			url = users.create_logout_url(self.request.uri)
 			url_linktext = 'Logout'
@@ -30,7 +40,7 @@ class doList(webapp.RequestHandler):
 			url_linktext = 'Login'
 
 		template_values = {
-			'pages': pages,
+			'pages': display_pages,
 			'url': url,
 			'url_linktext': url_linktext,
 		}
@@ -69,14 +79,31 @@ class doEdit(webapp.RequestHandler):
 			pageName = page
 		else:
 			pageName = 'home'
+			
+		public = ''
+		tags = ''
 
 		homepages = db.GqlQuery("SELECT * FROM HomePage WHERE name = :1",
 				pageName)
 		if homepages.count(1) > 0:
 			homepage = homepages.fetch(1)[0]
+			if homepage.public == True:
+				public = 'checked="checked"'
+			if homepage.tags is not None:
+				tags = homepage.tags
 		else:
-			homepage = HomePage(content='New page..')
-
+			homepage = HomePage(content='''<!DOCTYPE html>
+<html>
+<head><title></title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"/>
+<style>
+</style>
+</head>
+<body>
+</body>
+</html>
+''')
+			
 		if users.get_current_user():
 			url = users.create_logout_url(self.request.uri)
 			url_linktext = 'Logout'
@@ -89,6 +116,8 @@ class doEdit(webapp.RequestHandler):
 			'url': url,
 			'url_linktext': url_linktext,
 			'pageName':pageName,
+			'public':public,
+			'tags': tags,
 		}
 	
 		if users.is_current_user_admin():
@@ -120,6 +149,11 @@ class doEdit(webapp.RequestHandler):
 				homepage.content = self.request.get('con')
 				latestTime = datetime.now()
 				homepage.lastmod = latestTime
+				if self.request.get('public') == 'on':
+					homepage.public = True
+				else:
+					homepage.public = False
+				homepage.tags = self.request.get('tags')
 				homepage.put()
 				if pageName == 'home':
 					self.redirect('/')
