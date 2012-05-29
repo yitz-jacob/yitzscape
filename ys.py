@@ -95,7 +95,7 @@ class doEdit(webapp.RequestHandler):
 			homepage = HomePage(content='''<!DOCTYPE html>
 <html>
 <head><title></title>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"/>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
 <style>
 </style>
 </head>
