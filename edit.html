@@ -1,0 +1,17 @@
+<html>
+<head>
+<title>edit homepage -yitzscape</title>
+</head>
+<body>
+<form method="POST" name="editForm" action="/{{pageName}}/edit">
+  <!-- author: {{ page.author }}-->
+  <!-- lastmod: {{ page.lastmod }} -->
+<textarea name="con" style="width:100%;height:90%">
+{{ page.content|escape }}
+</textarea>
+
+<br/>
+<input type="submit" value="Save"/>
+</form>
+</body>
+</html>
