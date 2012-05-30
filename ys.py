@@ -16,6 +16,7 @@ class HomePage(db.Model):
 	name = db.StringProperty(multiline=False)
 	public = db.BooleanProperty()
 	tags = db.StringProperty(multiline=False)
+	source = db.TextProperty()
 	
 class doList(webapp.RequestHandler):
 	def get(self):
@@ -44,8 +45,11 @@ class doList(webapp.RequestHandler):
 			'url': url,
 			'url_linktext': url_linktext,
 		}
-
-		path = os.path.join(os.path.dirname(__file__), 'list.html')
+		
+		if users.is_current_user_admin():
+			path = os.path.join(os.path.dirname(__file__), 'admin_list.html')
+		else:
+			path = os.path.join(os.path.dirname(__file__), 'list.html')
 		self.response.out.write(template.render(path, template_values))
 	
 class MainPage(webapp.RequestHandler):
@@ -82,7 +86,8 @@ class doEdit(webapp.RequestHandler):
 			
 		public = ''
 		tags = ''
-
+		markdown = ''
+		
 		homepages = db.GqlQuery("SELECT * FROM HomePage WHERE name = :1",
 				pageName)
 		if homepages.count(1) > 0:
@@ -91,6 +96,8 @@ class doEdit(webapp.RequestHandler):
 				public = 'checked="checked"'
 			if homepage.tags is not None:
 				tags = homepage.tags
+			if homepage.source is not None:
+				markdown = homepage.source
 		else:
 			homepage = HomePage(content='''<!DOCTYPE html>
 <html>
@@ -113,6 +120,7 @@ class doEdit(webapp.RequestHandler):
 
 		template_values = {
 			'page': homepage,
+			'md': markdown,
 			'url': url,
 			'url_linktext': url_linktext,
 			'pageName':pageName,
@@ -124,7 +132,10 @@ class doEdit(webapp.RequestHandler):
 			path = os.path.join(os.path.dirname(__file__), 'edit.html')
 			self.response.out.write(template.render(path, template_values))
 		else:
-			self.redirect(users.create_login_url(self.request.uri))
+			if users.get_current_user():
+				self.redirect('/list')
+			else:
+				self.redirect(users.create_login_url(self.request.uri))
 
 	def post(self,page):
 		if users.is_current_user_admin():
@@ -147,6 +158,7 @@ class doEdit(webapp.RequestHandler):
 			if len(self.request.get('con')) > 0:
 				homepage.name = pageName
 				homepage.content = self.request.get('con')
+				homepage.source = self.request.get('md')
 				latestTime = datetime.now()
 				homepage.lastmod = latestTime
 				if self.request.get('public') == 'on':
@@ -189,6 +201,8 @@ def handlePage(handler, page):
 
 	if homepages.count(1) > 0:
 		homepage = homepages.fetch(1)[0]
+		if homepage.public == False and not users.is_current_user_admin():
+			homepage = HomePage(content='insufficient permissions to view this page')
 	else:
 		homepage = HomePage(content='page does not exist')
 
