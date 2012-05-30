@@ -1,18 +1,95 @@
 <html>
 <head>
 <title>edit {{pageName}} -yitzscape</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
+<script type="text/javascript" src="/showdown.js"></script>
 </head>
 <body>
 <form method="POST" name="editForm" action="/{{pageName}}/edit">
   <!-- author: {{ page.author }}-->
   <!-- lastmod: {{ page.lastmod }} -->
-<textarea name="con" style="width:100%;height:90%">
+<style type="text/css">
+ul.tabs, ul.tabs li {
+	list-style-type:none;
+}
+ul.tabs a{
+	color:white;
+	text-decoration:none;
+}
+ul.tabs li {
+	background-color:violet;
+	font-weight:bold;
+	color:black;
+	margin-right:7px;
+	padding:3px;
+	display:inline-block;
+	float:left;
+
+}
+ul.tabs li.selected{
+	background-color:purple;
+	font-weight:bold;
+	color:white;
+}
+div.tab_contents{
+	border:3px solid purple;
+	clear:both;
+	display:none;
+}
+div.selected {
+	display:block;
+}
+</style>
+<ul class="tabs">
+<li><a href="#markdown">Markdown</a></li>
+<li class="selected"><a href="#html">Raw HTML</a></li>
+<li><a href="#preview">Preview</a></li>
+</ul>
+<div id="markdown" class="tab_contents">
+<textarea name="md" style="width:100%;height:80%">
+{{ md|escape }}
+</textarea>
+</div>
+<div id="html" class="tab_contents selected">
+<textarea name="con" style="width:100%;height:80%">
 {{ page.content|escape }}
 </textarea>
+</div>
+<div id="preview" class="tab_contents" style="height:80%">
+{{ page.content }}
+</div>
 
 <label for="tags">Tags</label><input type="text" id="tags" style="width:50%;" value="{{tags|escape}}" name="tags"/> <input type="checkbox" id="public" {{public}} name="public"> <label for="public">Public</label>
 <br/>
 <input type="submit" value="Save"/>
 </form>
+<script type="text/javascript">
+jQuery(function(){
+	var converter = new Showdown.converter();
+
+	jQuery('#markdown textarea').on('change',function(){
+		jQuery('#html textarea').val(converter.makeHtml(jQuery(this).val()));
+	});
+
+	jQuery('ul.tabs li a').on('click',function(e){
+		e.preventDefault();
+		jQuery('div.tab_contents').hide();
+		jQuery('ul.tabs li').removeClass('selected');
+		jQuery(this).parent().addClass('selected');
+		jQuery(jQuery(this).attr('href')).show();
+
+		switch (jQuery(this).attr('href')){
+			case '#markdown':
+				break;
+			case '#html':
+				break;
+			case '#preview':
+				jQuery('#preview').html(jQuery('#html textarea').val());
+				break;
+		}
+
+	});
+});
+</script>
 </body>
 </html>
