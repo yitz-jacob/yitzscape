@@ -220,6 +220,8 @@ def handlePage(handler, page):
 	}
 
 	path = os.path.join(os.path.dirname(__file__), 'index.html')
+	if homepage.tags and 'js' in homepage.tags.split(','):
+		handler.response.headers.add_header('Content-type','text/javascript');
 	handler.response.out.write(template.render(path, template_values))
 
 	
