@@ -1,11 +1,43 @@
 <html>
 <head>
 <title>Exhaustive Content List</title>
+<style type="text/css">
+a.edit-link {
+	text-decoration: none;
+	font-size: small;
+}
+a.page-link {
+	text-decoration: none;
+	font-weight: bold;
+	font-size: 2em;
+	color:#14b0f9;
+}
+a.page-link:hover{
+	text-decoration: underline;
+}
+span.tags {
+	color:gray;
+	font-size: small;
+}
+span.public {
+	color:blue;
+	font-size: small;
+}
+ul {
+	list-style-type: none;
+	line-height: 1.5;
+	margin-left: 100px;
+}
+</style>
 </head>
 <body>
+<h1>Site Contents</h1>
 <ul>
 {% for page in pages %}
-<li><a href="/{{ page.name }}">{{page.name}}</a> <span class="public">(public: {{page.public}})</span> <span class="tags">(tags: {{page.tags}})</span></li>
+<li><a class="page-link" href="/{{ page.name }}">{{page.name}}</a> 
+{% if page.tags %} <span class="tags">{{page.tags}}</span>{% endif %}
+
+</li>
 {% endfor %}
 </ul>
 </body>
