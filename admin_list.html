@@ -1,0 +1,44 @@
+<html>
+<head>
+<title>Exhaustive Content List</title>
+<style type="text/css">
+a.edit-link {
+	text-decoration: none;
+	font-size: small;
+}
+a.page-link {
+	text-decoration: none;
+	font-weight: bold;
+	font-size: large;
+	color:#14b0f9;
+}
+a.page-link:hover{
+	text-decoration: underline;
+}
+span.tags {
+	color:gray;
+	font-size: small;
+}
+span.public {
+	color:blue;
+	font-size: small;
+}
+ul {
+	list-style-type: decimal-leading-zero;
+	line-height: 1.5;
+	margin-left: 100px;
+}
+</style>
+</head>
+<body>
+<h1>Site Contents</h1>
+<ul>
+{% for page in pages %}
+<li><a class="page-link" href="/{{ page.name }}">{{page.name}}</a> <a href="/{{page.name}}/edit" class="edit-link">[edit]</a> 
+{% if page.tags %} <span class="tags">{{page.tags}}</span>{% endif %}
+{% if page.public %}<span class="public">(public)</span>{% endif %} 
+
+</li>
+{% endfor %}
+</ul>
+</body>
